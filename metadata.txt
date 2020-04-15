@@ -1,0 +1,34 @@
+# This file contains metadata for your plugin.
+
+# Mandatory items:
+[general]
+name=EDC_OGC
+qgisMinimumVersion=2.0
+qgisMaximumVersion=3.99
+description=EDC-OGC plugin enables users to handle Eurodatacube services directly from QGIS.
+version=1.0.0
+author=EOX IT Gmbh
+email=office@eox.at
+
+about=EDC-OGC plugin provides an interface to render all the layers created in Eurodatacube Configuration Utility for a generated EDC-OGC url. Users can explore select sublayers, parameters and styles of each collection that is configured in the EDC configuration panel, by simply providing the generated EDC-OGC URL
+
+homepage=
+tracker=
+repository=
+
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+
+category=Web
+icon=favicon.ico
+
+# experimental flag
+experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
