@@ -12,6 +12,7 @@ import calendar
 import datetime
 import math
 from xml.etree import ElementTree
+import lxml.html as html 
 try:
     from urllib.parse import quote_plus
 except ImportError:
@@ -200,7 +201,9 @@ class EDC_OGC:
         self.toolbar.setObjectName(u'EDC_OGC')
         self.pluginIsActive = False
         self.dockwidget = None
+        self.instances = {}
         self.base_url = None
+        self.service_url = None
         self.data_source = None
 
         # Set value
@@ -208,7 +211,7 @@ class EDC_OGC:
         self.download_folder = QSettings().value(Settings.download_folder_location, '')
         self._check_local_variables()
 
-        self.service_type = None
+        self.service_type = 'wms'
 
         self.qgis_layers = []
         self.capabilities = Capabilities('')
@@ -273,15 +276,12 @@ class EDC_OGC:
         Layers - Renderers
         Priority
         """
-        self.dockwidget.serviceType.addItems(Settings.service_types)
         self.update_instance_props(instance_changed=True)
 
         self.dockwidget.baseUrl.setText(self.base_url)
         self.dockwidget.destination.setText(self.download_folder)
         self.set_values()
 
-        # self.dockwidget.priority.clear()
-        # self.dockwidget.priority.addItems([priority[1] for priority in Settings.priorities])
 
         self.dockwidget.format.clear()
         self.dockwidget.format.addItems([image_format[1] for image_format in Settings.image_formats])
@@ -345,8 +345,8 @@ class EDC_OGC:
         :param instance_changed: True if url has changed, False otherwise
         :type instance_changed: bool
         """
-        self.service_type = self.dockwidget.serviceType.currentText().lower()
-        self.dockwidget.createLayerLabel.setText('Create new {} layer'.format(self.service_type.upper()))
+        
+        self.dockwidget.createLayerLabel.setText('Create new WMS layer')
 
         if self.capabilities:
             collection_index = self.dockwidget.collections.currentIndex()
@@ -362,10 +362,8 @@ class EDC_OGC:
                 self.dockwidget.layers.setCurrentIndex(layer_index)
 
             self.dockwidget.epsg.clear()
-            if self.service_type == 'wms':
-                self.dockwidget.epsg.addItems([crs.name for crs in self.capabilities.crs_list])
-            if self.service_type == 'wmts':
-                self.dockwidget.epsg.addItems([crs.name for crs in self.capabilities.crs_list[:1]])
+            
+            self.dockwidget.epsg.addItems([crs.name for crs in self.capabilities.crs_list])
 
     def update_current_wms_layers(self, selected_layer=None):
         """
@@ -424,18 +422,10 @@ class EDC_OGC:
 
         # Every parameter that QGIS layer doesn't use by default must be in url
         # And url has to be encoded
-        url = '{}?Time={}'.format(self.base_url, self.get_time())
+        url = '{}?Time={}'.format(self.service_url, self.get_time())
         return '{}url={}'.format(uri, quote_plus(url))
 
-    def get_wmts_uri(self):
-        """ Generate URI for WMTS request from parameters """
-        uri = ''
-        request_parameters = list(Settings.parameters_wmts.items()) + list(Settings.parameters.items())
-
-        for parameter, value in request_parameters:
-            uri += '{}={}&'.format(parameter, value)
-        url = '{}?Time={}'.format(self.base_url, self.get_time())
-        return '{}url={}'.format(uri, quote_plus(url))
+    
 
     def get_wcs_url(self, bbox, crs=None):
         """ Generate URL for WCS request from parameters
@@ -445,7 +435,7 @@ class EDC_OGC:
         :param crs: CRS of bounding box
         :type crs: str or None
         """
-        url = '{}?'.format(self.base_url)
+        url = '{}?'.format(self.service_url)
         request_parameters = list(Settings.parameters_wcs.items()) + list(Settings.parameters.items())
 
         for parameter, value in request_parameters:
@@ -459,7 +449,7 @@ class EDC_OGC:
     def get_wfs_url(self, time_range):
         """ Generate URL for WFS request from parameters """
 
-        url = '{}?'.format(self.base_url)
+        url = '{}?'.format(self.service_url)
         for parameter, value in Settings.parameters_wfs.items():
             url += '{}={}&'.format(parameter, value)
 
@@ -475,7 +465,47 @@ class EDC_OGC:
             return url + '&format=application/json'
         return url
 
-    # ---------------------------------------------------------------------------
+    def get_instances_list(self, base_url):
+        if base_url != '' :
+            url = base_url + '/instances'
+        else:
+            return    
+
+        response = self.download_from_url(url, raise_invalid_id=True)
+
+
+        if not response:
+            return None
+        # this is a temporary method, the instances shall be provided in a json response    
+        html_root = html.fromstring(response.content)
+        div = html_root.xpath('//ul')
+
+        for layer in div[0].findall('li'):
+            instance = layer.find('a')
+            self.instances[instance.text] = instance.attrib['href']
+
+        self.dockwidget.instanceId.clear()
+        self.dockwidget.instanceId.addItems([name for name in self.instances.keys()])
+
+        
+        self.dockwidget.instanceId.setCurrentIndex(0)
+
+    def change_instance_ID(self, url):
+        if not url or isinstance(url, int):
+            url = self.base_url
+        if self.dockwidget.instanceId.currentIndex() >= 0:
+            instance_extension = self.instances[self.dockwidget.instanceId.currentText()]
+            self.service_url = url + instance_extension
+            capabilities = self.get_capabilities(self.service_url)
+            if capabilities:
+                self.capabilities = capabilities
+                self.update_instance_props(instance_changed=True)
+                if self.service_url:
+                    self.show_message("New URL and layers set.", Message.SUCCESS)
+                self.update_selected_collection()
+            return capabilities
+
+
 
     def get_capabilities(self, base_url, service='wms'):
         """ Get capabilities of desired service
@@ -500,7 +530,7 @@ class EDC_OGC:
         capabilities.load_xml(xml_root)
 
 
-        json_response = self.download_from_url(self.get_capabilities_url(self.base_url, service, get_json=True), raise_invalid_id=True)
+        json_response = self.download_from_url(self.get_capabilities_url(base_url, service, get_json=True), raise_invalid_id=True)
         if json_response:
             try:
                 capabilities.load_json(json_response.json())
@@ -654,16 +684,13 @@ class EDC_OGC:
         :return: new layer
         """
 
-        if not self.base_url:
+        if not self.service_url:
             return self.missing_url()
 
         self.update_parameters()
         name = self.get_qgis_layer_name()
-        if self.service_type == 'wms':
-            print(self.get_wms_uri())
-            new_layer = QgsRasterLayer(self.get_wms_uri(), name, 'wms')
-        else:
-            new_layer = QgsRasterLayer(self.get_wmts_uri(), name, 'wms')
+        new_layer = QgsRasterLayer(self.get_wms_uri(), name, 'wms')
+        
         if new_layer.isValid():
             if on_top and self.get_qgis_layers():
                 self.iface.setActiveLayer(self.get_qgis_layers()[0])
@@ -757,7 +784,7 @@ class EDC_OGC:
         """ Updating layer in pyqgis somehow doesn't work therefore this method creates a new layer and deletes the
             old one
         """
-        if not self.base_url:
+        if not self.service_url:
             return self.missing_url()
 
         selected_index = self.dockwidget.qgisLayerList.currentIndex()
@@ -888,13 +915,6 @@ class EDC_OGC:
             self.dockwidget.time1.show()
         """
 
-    def update_service_type(self):
-        """ Updates service type and parameters
-        """
-        self.update_instance_props()
-        self.update_parameters()
-
-
     def get_time(self):
         """
         Format time parameter according to settings
@@ -964,7 +984,7 @@ class EDC_OGC:
         Prepare download request and then download images
         :return:
         """
-        if not self.base_url:
+        if not self.service_url:
             return self.missing_url()
 
         if Settings.parameters_wcs['resx'] == '' or Settings.parameters_wcs['resy'] == '':
@@ -1072,20 +1092,27 @@ class EDC_OGC:
 
             self.dockwidget.time1.show()
             self.dockwidget.timeLabel.show()
+            
 
     def change_base_url(self):
         """
         Change base url, and check that it is valid
         :return:
         """
+
         new_base_url = self.dockwidget.baseUrl.text()
         if new_base_url == self.base_url:
             return
 
         if new_base_url == '':
-            capabilities = Capabilities(new_base_url)
-        else:
-            capabilities = self.get_capabilities(new_base_url)
+            self.show_message("Please provide a valid URL", Message.INFO)
+            self.dockwidget.baseUrl.setText(new_base_url)
+            return
+        # else:
+
+        self.get_instances_list(new_base_url)
+
+        capabilities = self.change_instance_ID(new_base_url)
 
         if capabilities:
             self.base_url = new_base_url
@@ -1239,7 +1266,8 @@ class EDC_OGC:
             if self.dockwidget is None:
                 # Initial function calls
                 self.dockwidget = EDC_OGC_DockWidget()
-                self.capabilities = self.get_capabilities(self.base_url)
+                self.get_instances_list(self.base_url)
+                self.capabilities = self.change_instance_ID(self.base_url)
                 self.init_gui_settings()
                 self.update_month()
                 self.toggle_extent('current')
@@ -1261,7 +1289,7 @@ class EDC_OGC:
 
                 # Render input fields changes and events
                 self.dockwidget.baseUrl.editingFinished.connect(self.change_base_url)
-                self.dockwidget.serviceType.currentIndexChanged.connect(self.update_service_type)
+                self.dockwidget.instanceId.currentIndexChanged.connect(self.change_instance_ID)
                 self.dockwidget.layers.currentIndexChanged.connect(self.update_selected_layer)
                 self.dockwidget.collections.currentIndexChanged.connect(self.update_selected_collection)
 

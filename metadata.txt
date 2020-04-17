@@ -2,15 +2,15 @@
 
 # Mandatory items:
 [general]
-name=EDC_OGC
+name=Euro Data Cube
 qgisMinimumVersion=2.0
 qgisMaximumVersion=3.99
-description=EDC-OGC plugin enables users to handle Eurodatacube services directly from QGIS.
+description=Euro Data Cube plugin enables users to handle Euro Data Cube services directly from QGIS.
 version=1.0.0
-author=EOX IT Gmbh
+author=EOX IT Services GmbH
 email=office@eox.at
 
-about=EDC-OGC plugin provides an interface to render all the layers created in Eurodatacube Configuration Utility for a generated EDC-OGC url. Users can explore select sublayers, parameters and styles of each collection that is configured in the EDC configuration panel, by simply providing the generated EDC-OGC URL
+about=The Euro Data Cube plugin provides an interface to render all the layers created in EuroD Data Cube Configuration Utility for a generated EDC-OGC url. Users can explore select sublayers, parameters and styles of each collection that is configured in the EDC configuration panel, by simply providing the generated EDC-OGC URL
 
 homepage=
 tracker=

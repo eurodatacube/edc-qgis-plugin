@@ -3,14 +3,8 @@
 This script contains parameters and settings for EDC_OGC services
 """
 
-# Base url
-services_base_url = 'https://o8r7hj6u3kxrwko.76c7d188-5f8b-4ef6-bfd3-b05641462557.hub.eox.at/'
-uswest_base_url = 'https://services-uswest2.sentinel-hub.com/ogc/'
-ipt_base_url = 'http://services.eocloud.sentinel-hub.com/v1/'
-
 # Locations where QGIS will save values
 service_url_location = "EDC_OGCo/service_base_url"
-instance_id_location = "EDC_OGC/instance_id"
 download_folder_location = "EDC_OGC/download_folder"
 
 service_types = ['WMS', 'WMTS']
@@ -73,24 +67,24 @@ parameters_wmts = {
     'tileMatrixSet': 'PopularWebMercator512'
 }
 
-data_source_props = {'S2L1C': {'url': services_base_url,
-                               'wfs_name': 'S2.TILE',
-                               'pretty_name': 'Sentinel-2 L1C'},
-                     'S2L2A': {'url': services_base_url,
-                               'wfs_name': 'DSS2',
-                               'pretty_name': 'Sentinel-2 L2A'},
-                     'S1GRD': {'url': services_base_url,
-                               'wfs_name': 'DSS3',
-                               'pretty_name': 'Sentinel-1'},
-                     'L8L1C': {'url': uswest_base_url,
-                               'wfs_name': 'DSS6',
-                               'pretty_name': 'Landsat 8'},
-                     'MODIS': {'url': uswest_base_url,
-                               'wfs_name': 'DSS5',
-                               'pretty_name': 'MODIS'},
-                     'DEM': {'url': uswest_base_url,
-                             'wfs_name': 'DSS4',
-                             'pretty_name': 'DEM'}}
+# data_source_props = {'S2L1C': {'url': services_base_url,
+#                                'wfs_name': 'S2.TILE',
+#                                'pretty_name': 'Sentinel-2 L1C'},
+#                      'S2L2A': {'url': services_base_url,
+#                                'wfs_name': 'DSS2',
+#                                'pretty_name': 'Sentinel-2 L2A'},
+#                      'S1GRD': {'url': services_base_url,
+#                                'wfs_name': 'DSS3',
+#                                'pretty_name': 'Sentinel-1'},
+#                      'L8L1C': {'url': uswest_base_url,
+#                                'wfs_name': 'DSS6',
+#                                'pretty_name': 'Landsat 8'},
+#                      'MODIS': {'url': uswest_base_url,
+#                                'wfs_name': 'DSS5',
+#                                'pretty_name': 'MODIS'},
+#                      'DEM': {'url': uswest_base_url,
+#                              'wfs_name': 'DSS4',
+#                              'pretty_name': 'DEM'}}
 
 # values for UI selections
 priorities = [('mostRecent', 'Most recent'),
