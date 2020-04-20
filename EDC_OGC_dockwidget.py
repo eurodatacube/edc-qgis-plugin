@@ -30,9 +30,7 @@ class EDC_OGC_DockWidget(QDockWidget, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        
-        # temporary hide the download tab
-        self.downloadTab.setVisible(False)
+
 
     def closeEvent(self, event):
         self.closingPlugin.emit()

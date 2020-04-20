@@ -83,6 +83,7 @@ class Capabilities:
         self.dimensions = {}
         self.layers = {}
         self.collections=[]
+        self.collection_list = {}
         self.crs_list = []
 
 
@@ -113,7 +114,7 @@ class Capabilities:
             namespace = ''
 
         for layer in xml_root.findall('./{0}Capability/{0}Layer/{0}Layer'.format(namespace)):
-            layer_name = layer.find('{}Name'.format(namespace)).text
+            layer_name = layer.find('{}Title'.format(namespace)).text
             sub_layers = layer.findall('./{0}Layer'.format(namespace))
             dimensions = layer.find('{}Dimension[@name="dim_bands"]'.format(namespace))
             wavelengths = layer.find('{}Dimension[@name="dim_wavelengths"]'.format(namespace))
@@ -121,7 +122,7 @@ class Capabilities:
             self.wavelengths[layer_name] = wavelengths.text.split(',') if wavelengths is not None else []
             self.dimensions[layer_name] = dimensions.text.split(',')
 
-                
+            self.collection_list[layer_name] =  layer.find('{}Name'.format(namespace)).text
             self.map_layers(layer, namespace, self.collections)
 
             sublayers= []
@@ -351,13 +352,14 @@ class EDC_OGC:
         if self.capabilities:
             collection_index = self.dockwidget.collections.currentIndex()
             self.dockwidget.collections.clear()
-            self.dockwidget.collections.addItems([collection.id for collection in self.capabilities.collections])
+            
+            self.dockwidget.collections.addItems([collection.name for collection in self.capabilities.collections])
             if not instance_changed:
                 self.dockwidget.collections.setCurrentIndex(collection_index)
 
             layer_index = self.dockwidget.layers.currentIndex() 
             self.dockwidget.layers.clear()
-            self.dockwidget.layers.addItems([layer.id for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
+            self.dockwidget.layers.addItems([layer.name for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
             if not instance_changed:
                 self.dockwidget.layers.setCurrentIndex(layer_index)
 
@@ -867,7 +869,7 @@ class EDC_OGC:
             self.clear_wavelengths_boxes()
             self.clear_dim_boxes()
 
-            self.dockwidget.layers.addItems([layer.id for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
+            self.dockwidget.layers.addItems([layer.name for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
             self.update_parameters()
             self.fill_dim_boxes()
             self.fill_wave_boxes()
@@ -1064,7 +1066,7 @@ class EDC_OGC:
 
         plugin_params.extend([Settings.parameters['dim_wavelengths'], Settings.parameters['dim_bands'], Settings.parameters['crs']])
 
-        return '{} ({})'.format(Settings.parameters['title'], ', '.join(plugin_params))
+        return '{} ({})'.format(Settings.parameters['layers'], ', '.join(plugin_params))
 
 
 

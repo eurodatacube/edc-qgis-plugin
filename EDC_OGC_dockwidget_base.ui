@@ -31,6 +31,9 @@
      <layout class="QVBoxLayout" name="mainVertical">
       <item>
        <widget class="QTabWidget" name="tabWidget">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -1168,6 +1171,9 @@
          </layout>
         </widget>
         <widget class="QWidget" name="downloadTab">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <attribute name="title">
           <string>Download</string>
          </attribute>
