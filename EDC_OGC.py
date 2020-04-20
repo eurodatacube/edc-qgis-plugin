@@ -221,6 +221,8 @@ class EDC_OGC:
         self.time1 = ''
         self.time1 = ''
         self.isDimensionsSelected = False
+        self.dim_bands = ''
+        self.dim_wavelengths = ''
 
         self.download_current_window = True
         self.custom_bbox_params = {}
@@ -416,15 +418,25 @@ class EDC_OGC:
     def get_wms_uri(self):
         """ Generate URI for WMS request from parameters """
         uri = ''
-        request_parameters = list(Settings.parameters_wms.items()) + list(Settings.parameters.items())
+        additional_parameters = ''
 
+        if self.dockwidget.wave_check.isChecked() or self.dockwidget.dim_check.isChecked() :
+            Settings.parameters['layers'] = self.capabilities.collection_list[self.dockwidget.collections.currentText()]
+        
+        if self.dockwidget.wave_check.isChecked():
+            additional_parameters = '&dim_wavelengths={}'.format(self.dim_wavelengths)
+             
+        elif self.dockwidget.dim_check.isChecked():
+                additional_parameters = '&dim_bands={}'.format(self.dim_bands)
+
+        request_parameters = list(Settings.parameters_wms.items()) + list(Settings.parameters.items())
         for parameter, value in request_parameters:
             
             uri += '{}={}&'.format(parameter, value)
 
         # Every parameter that QGIS layer doesn't use by default must be in url
         # And url has to be encoded
-        url = '{}?Time={}'.format(self.service_url, self.get_time())
+        url = '{}?Time={}{}'.format(self.service_url, self.get_time(),additional_parameters)
         return '{}url={}'.format(uri, quote_plus(url))
 
     
@@ -827,23 +839,23 @@ class EDC_OGC:
 
 
     def set_dimensions(self):
-         Settings.parameters['dim_bands'] = str(self.dockwidget.dimension_1.currentText()) + ',' + str(self.dockwidget.dimension_2.currentText()) + ',' + str(self.dockwidget.dimension_3.currentText())
+         self.dim_bands = str(self.dockwidget.dimension_1.currentText()) + ',' + str(self.dockwidget.dimension_2.currentText()) + ',' + str(self.dockwidget.dimension_3.currentText())
     def set_wavelengths(self):
-         Settings.parameters['dim_wavelengths'] = str(self.dockwidget.wavelength_1.currentText()) + ',' + str(self.dockwidget.wavelength_2.currentText()) + ',' + str(self.dockwidget.wavelength_3.currentText())
+         self.dim_wavelengths = str(self.dockwidget.wavelength_1.currentText()) + ',' + str(self.dockwidget.wavelength_2.currentText()) + ',' + str(self.dockwidget.wavelength_3.currentText())
 
     def clear_wavelengths_boxes(self):
         self.dockwidget.wavelength_1.clear()
         self.dockwidget.wavelength_2.clear()
         self.dockwidget.wavelength_3.clear()
         
-        Settings.parameters['dim_wavelengths'] =''
+        self.dim_wavelengths =''
 
     def clear_dim_boxes(self):
         self.dockwidget.dimension_1.clear()
         self.dockwidget.dimension_2.clear()
         self.dockwidget.dimension_3.clear()
         
-        Settings.parameters['dim_bands'] =''
+        self.dim_bands =''
 
     def fill_dim_boxes(self):
         self.dockwidget.dimension_1.addItems(self.capabilities.dimensions[self.dockwidget.collections.currentText()])
@@ -1063,10 +1075,19 @@ class EDC_OGC:
         :rtype: str
         """
         plugin_params = [self.service_type.upper()]
+        additional_parameter = ''
 
-        plugin_params.extend([Settings.parameters['dim_wavelengths'], Settings.parameters['dim_bands'], Settings.parameters['crs']])
+        plugin_params.append(Settings.parameters['crs'])
+        
+        if self.dockwidget.dim_check.isChecked():
+           additional_parameter = ',{}'.format(self.dim_bands)
 
-        return '{} ({})'.format(Settings.parameters['layers'], ', '.join(plugin_params))
+        elif self.dockwidget.dim_check.isChecked():
+            additional_parameter = ',{}'.format(self.dim_wavelengths)
+
+        
+
+        return '{} ({}{})'.format(Settings.parameters['layers'], ', '.join(plugin_params),additional_parameter)
 
 
 
@@ -1248,6 +1269,7 @@ class EDC_OGC:
         if not self.dockwidget.wave_check.isChecked():
             self.clear_wavelengths_boxes()
         else:
+            self.dockwidget.dim_check.setChecked(False)
             self.fill_wave_boxes()
 
 
@@ -1256,6 +1278,7 @@ class EDC_OGC:
         if not self.dockwidget.dim_check.isChecked():
             self.clear_dim_boxes()
         else:
+            self.dockwidget.wave_check.setChecked(False)
             self.fill_dim_boxes()
             
 

@@ -14,9 +14,7 @@ parameters = {
     'title': '',
     'layers': '',
     'time': '',
-    'crs': 'EPSG:3857',
-    'dim_bands': '',
-    'dim_wavelengths':''
+    'crs': 'EPSG:3857'
 }
 
 # WMS parameters - the first 3 parameters are required for qgis layer
