@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-This script contains parameters and settings for EDC_OGC services
+This script contains parameters and settings for Euro Data Cube services
 """
 
 # Locations where QGIS will save values
-service_url_location = "EDC_OGCo/service_base_url"
-download_folder_location = "EDC_OGC/download_folder"
+service_url_location = "Euro Data Cube/service_base_url"
+download_folder_location = "Euro Data Cube/download_folder"
 
 service_types = ['WMS', 'WMTS']
 

@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/EDC_OGC" >
+    <qresource prefix="/plugins/Euro Data Cube" >
         <file>favicon.ico</file>
     </qresource>
 </RCC>

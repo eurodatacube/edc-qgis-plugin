@@ -184,7 +184,7 @@ class EDC_OGC:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'EDC_OGC_{}.qm'.format(locale))
+            'Euro Data Cube{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -196,9 +196,9 @@ class EDC_OGC:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.translate(u'&EDC_OGC')
-        self.toolbar = self.iface.addToolBar(u'EDC_OGC')
-        self.toolbar.setObjectName(u'EDC_OGC')
+        self.menu = self.translate(u'&Euro Data Cube')
+        self.toolbar = self.iface.addToolBar(u'Euro Data Cube')
+        self.toolbar.setObjectName(u'Euro Data Cube')
         self.pluginIsActive = False
         self.dockwidget = None
         self.instances = {}
@@ -232,7 +232,7 @@ class EDC_OGC:
     def translate(message):
         """Get the translation for a string using Qt translation API.
         """
-        return QCoreApplication.translate('EDC_OGC', message)
+        return QCoreApplication.translate('Euro Data Cube', message)
 
     def add_action(self, icon_path, text, callback, enabled_flag=True, add_to_menu=True, add_to_toolbar=True,
                    status_tip=None, whats_this=None, parent=None):
@@ -264,10 +264,10 @@ class EDC_OGC:
     def initGui(self):  # This method is called by QGIS
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/EDC_OGC/favicon.ico'
+        icon_path = ':/plugins/Euro Data Cube/favicon.ico'
         self.add_action(
             icon_path,
-            text=self.translate(u'EDC_OGC'),
+            text=self.translate(u'Euro Data Cube'),
             callback=self.run,
             parent=self.iface.mainWindow())
 
@@ -404,7 +404,7 @@ class EDC_OGC:
 
         for action in self.actions:
             self.iface.removePluginWebMenu(
-                self.translate(u'&EDC_OGC'),
+                self.translate(u'&Euro Data Cube'),
                 action)
             self.iface.removeToolBarIcon(action)
         del self.toolbar
