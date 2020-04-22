@@ -11,6 +11,8 @@ import time
 import calendar
 import datetime
 import math
+import re
+import ast
 from xml.etree import ElementTree
 import lxml.html as html 
 try:
@@ -22,7 +24,7 @@ from . import resources  # this import is used because it imports resources.qrc
 from .EDC_OGC_dockwidget import EDC_OGC_DockWidget
 from . import Settings
 
-from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsRectangle, QgsMessageLog
+from qgis.core import QgsRasterLayer, QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsRectangle, QgsMessageLog, QgsApplication
 
 if is_qgis_version_3():
     from qgis.utils import Qgis
@@ -490,6 +492,7 @@ class EDC_OGC:
 
         if not response:
             return None
+
         # this is a temporary method, the instances shall be provided in a json response    
         html_root = html.fromstring(response.content)
         div = html_root.xpath('//ul')
@@ -702,8 +705,33 @@ class EDC_OGC:
             return self.missing_url()
 
         self.update_parameters()
+        uri = self.get_wms_uri()
         name = self.get_qgis_layer_name()
-        new_layer = QgsRasterLayer(self.get_wms_uri(), name, 'wms')
+        new_layer = QgsRasterLayer(uri, name, 'wms')
+
+        interface = self.iface
+
+        def errorCatcher(msg, tag, level):
+            if tag == 'WMS' and level != 0:
+    
+                result = re.search('BAD REQUEST url: (.*)]', msg)
+                if result :
+                    error_url = result.group(1)
+                    response = requests.get(error_url)
+                    
+                    dict_error = re.search(r'({.+})', response.text)
+
+                    if dict_error :
+                        
+                        error_content = dict_error.group(0)
+
+                        message =  ast.literal_eval(error_content)
+
+                        interface.messageBar().pushMessage('Warning', '{}'.format(message["error"]["message"]), Qgis.Warning)
+        if is_qgis_version_3():
+            QgsApplication.messageLog().messageReceived.connect(errorCatcher)
+        else :
+            QgsMessageLog.instance().messageReceived.connect(errorCatcher)
         
         if new_layer.isValid():
             if on_top and self.get_qgis_layers():
@@ -1062,32 +1090,33 @@ class EDC_OGC:
                 time_interval[1] = '-'  # 'end'
         return '/'.join(time_interval)
 
-    def get_dimensions_name(self):
 
-        return
-    def get_wavelength_name(self):
-
-        return
     def get_qgis_layer_name(self):
         """ Returns name of new qgis layer
 
         :return: qgis layer name
         :rtype: str
         """
-        plugin_params = [self.service_type.upper()]
+        plugin_params = [self.get_time_name()]
         additional_parameter = ''
+        collection_name = ''
+        layer_name = '_' + self.dockwidget.layers.currentText()
 
-        plugin_params.append(Settings.parameters['crs'])
-        
+        plugin_params.extend([Settings.parameters_wms['styles'], Settings.parameters['crs']])
+        # in case of dimension or wavelengths are requested, we need only the collection name
         if self.dockwidget.dim_check.isChecked():
            additional_parameter = ',{}'.format(self.dim_bands)
+           layer_name = ''
+
 
         elif self.dockwidget.dim_check.isChecked():
             additional_parameter = ',{}'.format(self.dim_wavelengths)
-
+            layer_name = ''
+        else :
+            collection_name = self.dockwidget.collections.currentText() + '_'
         
 
-        return '{} ({}{})'.format(Settings.parameters['layers'], ', '.join(plugin_params),additional_parameter)
+        return '{}{} ({}{})'.format(collection_name, layer_name, ', '.join(plugin_params), additional_parameter)
 
 
 
