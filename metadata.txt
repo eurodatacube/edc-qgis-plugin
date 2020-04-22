@@ -5,14 +5,14 @@
 name=Euro Data Cube
 qgisMinimumVersion=2.0
 qgisMaximumVersion=3.99
-description=Euro Data Cube plugin enables users to handle Euro Data Cube services directly from QGIS.
-version=0.0.1
+description=The Euro Data Cube plugin enables users to handle Euro Data Cube services directly from QGIS.
+version=1.0.0
 author=EOX IT Services GmbH
 email=office@eox.at
 
-about=The Euro Data Cube plugin provides an interface to render all the layers created in Euro Data Cube Configuration Utility for a generated EDC-OGC url. Users can explore select sublayers, parameters and styles of each collection that is configured in the EDC configuration panel, by simply providing the generated EDC-OGC URL
+about=The Euro Data Cube plugin provides an interface to render all the layers created in the Euro Data Cube Configuration Utility for a generated EDC-OGC url. Users can select and explore layers, parameters, and styles of each collection that is configured in the EDC configuration panel, by simply providing the generated EDC-OGC URL.
 
-homepage=
+homepage=https://eurodatacube.com
 tracker=
 repository=
 
