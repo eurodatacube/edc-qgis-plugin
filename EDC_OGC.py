@@ -858,7 +858,7 @@ class EDC_OGC:
         """
         if self.capabilities:
             self.update_selected_crs()
-            self.update_selected_layer()
+            self.update_selected_style()
             
         Settings.parameters['time'] = self.get_time()
 
@@ -915,7 +915,7 @@ class EDC_OGC:
             self.clear_dim_boxes()
 
             self.dockwidget.layers.addItems([layer.name for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
-            self.update_parameters()
+            self.update_selected_layer()
             self.fill_dim_boxes()
             self.fill_wave_boxes()
             self.dockwidget.dim_check.setCheckState(0)
@@ -923,44 +923,39 @@ class EDC_OGC:
             # uncheck the dimension and wavelengths boxes
             self.check_dim_box()
             self.check_wave_box()
+
     def update_styles(self, layers, index):
         self.dockwidget.styles.clear()
         self.dockwidget.styles.addItems([style for style in layers[index].styles])
+
+    def update_selected_style(self):
+
+        wms_layers = self.capabilities.layers[self.dockwidget.collections.currentText()]
+        layer_index = self.dockwidget.layers.currentIndex()
+        styles = wms_layers[layer_index].styles
+
+        if  0 <= self.dockwidget.styles.currentIndex() < len(styles) :
+            Settings.parameters_wms['styles'] = self.dockwidget.styles.currentText()
+
+
+    
+
     def update_selected_layer(self):
         """ Updates properties of selected OGC layer
         """
         layers_index = self.dockwidget.layers.currentIndex()
-
         if self.dockwidget.collections.currentText() != "":
+
             wms_layers = self.capabilities.layers[self.dockwidget.collections.currentText()]
-            self.update_styles(wms_layers, layers_index)
-            styles = self.dockwidget.styles.currentText()
+            
             if 0 <= layers_index < len(wms_layers):
-                
-                Settings.parameters_wms['styles'] = styles if styles is not None else ''
+                self.update_styles(wms_layers, layers_index)
+                self.update_parameters()
                 Settings.parameters['layers'] = wms_layers[layers_index].id
                 Settings.parameters_wcs['coverage'] = wms_layers[layers_index].id
                 Settings.parameters['title'] = wms_layers[layers_index].name
 
 
-
-        """
-        # This doesn't hide vertical spacer and therefore doesn't look good
-        if self.is_timeless_source() and not self.dockwidget.calendar.isHidden():
-            self.dockwidget.calendar.hide()
-            self.dockwidget.exactDate.hide()
-            self.dockwidget.timeRangeLabel.hide()
-            self.dockwidget.timeLabel.hide()
-            self.dockwidget.time0.hide()
-            self.dockwidget.time1.hide()
-        if not self.is_timeless_source() and self.dockwidget.calendar.isHidden():
-            self.dockwidget.calendar.show()
-            self.dockwidget.exactDate.show()
-            self.dockwidget.timeRangeLabel.show()
-            self.dockwidget.timeLabel.show()
-            self.dockwidget.time0.show()
-            self.dockwidget.time1.show()
-        """
 
     def get_time(self):
         """
@@ -1350,6 +1345,7 @@ class EDC_OGC:
                 self.dockwidget.instanceId.currentIndexChanged.connect(self.change_instance_ID)
                 self.dockwidget.layers.currentIndexChanged.connect(self.update_selected_layer)
                 self.dockwidget.collections.currentIndexChanged.connect(self.update_selected_collection)
+                self.dockwidget.styles.currentIndexChanged.connect(self.update_selected_style)
 
                 self.dockwidget.time0.mousePressEvent = lambda _: self.move_calendar('time0')
                 self.dockwidget.time1.mousePressEvent = lambda _: self.move_calendar('time1')
@@ -1366,6 +1362,7 @@ class EDC_OGC:
                 self.dockwidget.wavelength_2.currentIndexChanged.connect(self.set_wavelengths)
                 self.dockwidget.wavelength_3.currentIndexChanged.connect(self.set_wavelengths)
                 self.dockwidget.calendar.currentPageChanged.connect(self.update_month)
+                
 
 
                 self.dockwidget.destination.editingFinished.connect(self.change_download_folder)
