@@ -508,8 +508,13 @@ class EDC_OGC:
         self.dockwidget.instanceId.setCurrentIndex(0)
 
     def change_instance_ID(self, url):
+
         if not url or isinstance(url, int):
+            if url == '' or self.base_url == '' :
+                self.show_message("Please provide a valid URL", Message.INFO)
+                return
             url = self.base_url
+        
         if self.dockwidget.instanceId.currentIndex() >= 0:
             instance_extension = self.instances[self.dockwidget.instanceId.currentText()]
             self.service_url = url + instance_extension
@@ -1160,7 +1165,6 @@ class EDC_OGC:
             self.show_message("Please provide a valid URL", Message.INFO)
             self.dockwidget.baseUrl.setText(new_base_url)
             return
-        # else:
 
         self.get_instances_list(new_base_url)
 
@@ -1174,10 +1178,10 @@ class EDC_OGC:
                 self.show_message("New URL and layers set.", Message.SUCCESS)
             QSettings().setValue(Settings.service_url_location, new_base_url)
             self.update_selected_collection()
-            
+    
         else:
             self.dockwidget.baseUrl.setText(self.base_url)
-
+        
     def change_download_folder(self):
         """ Sets new download folder"""
         new_download_folder = self.dockwidget.destination.text()
