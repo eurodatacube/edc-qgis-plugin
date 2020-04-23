@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>EDC-OGC</string>
+   <string>Euro Data Cube</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">
@@ -60,7 +60,7 @@
           <property name="bottomMargin">
            <number>5</number>
           </property>
-          <item row="2" column="0" alignment="Qt::AlignLeft">
+          <item row="3" column="0" alignment="Qt::AlignLeft">
            <widget class="QWidget" name="actionTab" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -193,7 +193,7 @@
             <zorder>buttonAddWms</zorder>
            </widget>
           </item>
-          <item row="0" column="0" rowspan="2">
+          <item row="2" column="0">
            <widget class="QScrollArea" name="scrollAreaRenderer">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -227,55 +227,7 @@
                 </property>
                </widget>
               </item>
-              <item row="14" column="0">
-               <widget class="QLabel" name="timeRangeLabel">
-                <property name="text">
-                 <string>Time range</string>
-                </property>
-               </widget>
-              </item>
-              <item row="7" column="1">
-               <widget class="QComboBox" name="styles">
-                <property name="maximumSize">
-                 <size>
-                  <width>400</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="16" column="1">
-               <layout class="QHBoxLayout" name="horizontalLayout_3">
-                <item>
-                 <spacer name="maxccSpacer">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-              <item row="7" column="0">
-               <widget class="QLabel" name="label_5">
-                <property name="text">
-                 <string>style</string>
-                </property>
-               </widget>
-              </item>
-              <item row="20" column="0">
-               <widget class="QLabel" name="label_3">
-                <property name="text">
-                 <string>dimensions</string>
-                </property>
-               </widget>
-              </item>
-              <item row="23" column="1">
+              <item row="28" column="1">
                <spacer name="verticalSpacer">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
@@ -288,208 +240,7 @@
                 </property>
                </spacer>
               </item>
-              <item row="9" column="1">
-               <widget class="QComboBox" name="epsg">
-                <property name="minimumSize">
-                 <size>
-                  <width>400</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>400</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="1">
-               <widget class="QComboBox" name="layers">
-                <property name="minimumSize">
-                 <size>
-                  <width>400</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>400</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="editable">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="18" column="1" rowspan="3">
-               <layout class="QHBoxLayout" name="horizontalLayout_13">
-                <property name="sizeConstraint">
-                 <enum>QLayout::SetMaximumSize</enum>
-                </property>
-                <item>
-                 <widget class="QRadioButton" name="dim_check">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="dimension_1">
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="dimension_2">
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="dimension_3">
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_9">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-              <item row="9" column="0">
-               <widget class="QLabel" name="crsLabel">
-                <property name="text">
-                 <string>CRS</string>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="1">
-               <widget class="QComboBox" name="instanceId">
-                <property name="minimumSize">
-                 <size>
-                  <width>400</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>400</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="instanceIdLabel_2">
-                <property name="text">
-                 <string>instance ID</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="layerLabel">
-                <property name="text">
-                 <string>Collection</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="baseUrl">
-                <property name="minimumSize">
-                 <size>
-                  <width>300</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>400</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="inputMask">
-                 <string/>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="placeholderText">
-                 <string>xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</string>
-                </property>
-               </widget>
-              </item>
-              <item row="21" column="1">
-               <layout class="QHBoxLayout" name="horizontalLayout_14">
-                <item>
-                 <widget class="QRadioButton" name="wave_check">
-                  <property name="text">
-                   <string/>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="wavelength_3"/>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="wavelength_2"/>
-                </item>
-                <item>
-                 <widget class="QComboBox" name="wavelength_1"/>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_10">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-              <item row="21" column="0">
-               <widget class="QLabel" name="label_4">
-                <property name="text">
-                 <string>wavlength combination</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="instanceIdLabel">
-                <property name="text">
-                 <string>ogc-edc URL</string>
-                </property>
-               </widget>
-              </item>
-              <item row="14" column="1">
+              <item row="18" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout">
                 <item>
                  <widget class="QLineEdit" name="time0">
@@ -578,7 +329,145 @@
                 </item>
                </layout>
               </item>
-              <item row="15" column="1">
+              <item row="5" column="1">
+               <widget class="QComboBox" name="collections">
+                <property name="minimumSize">
+                 <size>
+                  <width>400</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="28" column="1">
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>10</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="baseUrl">
+                <property name="minimumSize">
+                 <size>
+                  <width>400</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="inputMask">
+                 <string/>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>https://ogc.xxxxxxxx.hub.eox.at</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="instanceIdLabel_2">
+                <property name="text">
+                 <string>instance ID</string>
+                </property>
+               </widget>
+              </item>
+              <item row="13" column="1">
+               <widget class="QComboBox" name="epsg">
+                <property name="minimumSize">
+                 <size>
+                  <width>400</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="instanceIdLabel">
+                <property name="text">
+                 <string>URL to EDC OGC Layer App</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QComboBox" name="instanceId">
+                <property name="minimumSize">
+                 <size>
+                  <width>400</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="11" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>Style</string>
+                </property>
+               </widget>
+              </item>
+              <item row="13" column="0">
+               <widget class="QLabel" name="crsLabel">
+                <property name="text">
+                 <string>CRS</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="layerLabel">
+                <property name="text">
+                 <string>Collection</string>
+                </property>
+               </widget>
+              </item>
+              <item row="18" column="0">
+               <widget class="QLabel" name="timeRangeLabel">
+                <property name="text">
+                 <string>Time range</string>
+                </property>
+               </widget>
+              </item>
+              <item row="11" column="1">
+               <widget class="QComboBox" name="styles">
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item row="19" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_6">
                 <item>
                  <widget class="QLabel" name="calendarSpacer">
@@ -1117,8 +1006,8 @@
                 </item>
                </layout>
               </item>
-              <item row="5" column="1">
-               <widget class="QComboBox" name="collections">
+              <item row="6" column="1">
+               <widget class="QComboBox" name="layers">
                 <property name="minimumSize">
                  <size>
                   <width>400</width>
@@ -1131,9 +1020,45 @@
                   <height>16777215</height>
                  </size>
                 </property>
+                <property name="editable">
+                 <bool>false</bool>
+                </property>
                </widget>
               </item>
-              <item row="15" column="0">
+              <item row="10" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_14">
+                <item>
+                 <widget class="QRadioButton" name="wave_check">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="wavelength_3"/>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="wavelength_2"/>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="wavelength_1"/>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_10">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="19" column="0">
                <layout class="QVBoxLayout" name="verticalCalendarLayout">
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -1163,6 +1088,167 @@
                  </spacer>
                 </item>
                </layout>
+              </item>
+              <item row="20" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item>
+                 <widget class="QLabel" name="maxccLabel">
+                  <property name="minimumSize">
+                   <size>
+                    <width>200</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Cloud coverage 100%</string>
+                  </property>
+                  <property name="indent">
+                   <number>-1</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSlider" name="maxcc">
+                  <property name="minimumSize">
+                   <size>
+                    <width>195</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>195</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="maximum">
+                   <number>100</number>
+                  </property>
+                  <property name="value">
+                   <number>100</number>
+                  </property>
+                  <property name="sliderPosition">
+                   <number>100</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="maxccSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="10" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>Wavelengths</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="0">
+               <widget class="QLabel" name="label_3">
+                <property name="text">
+                 <string>Bands</string>
+                </property>
+               </widget>
+              </item>
+              <item row="8" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_13">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetMaximumSize</enum>
+                </property>
+                <item>
+                 <widget class="QRadioButton" name="dim_check">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="dimension_1">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="dimension_2">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="dimension_3">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_9">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="21" column="0">
+               <widget class="QLabel" name="priorityLabel">
+                <property name="text">
+                 <string>Image priority</string>
+                </property>
+               </widget>
+              </item>
+              <item row="21" column="1">
+               <widget class="QComboBox" name="priority">
+                <property name="minimumSize">
+                 <size>
+                  <width>400</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>400</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
               </item>
              </layout>
             </widget>
