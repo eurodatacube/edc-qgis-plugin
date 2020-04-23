@@ -9,7 +9,7 @@ to setup locally:
 ```
  pyrcc5 -o resources.py resources.qrc
 ```
-
+- in **QGIS** got to `plugins -> Manage and install plugins -> installed` and enable the **Euro Data Cube**
 
 ## Prerequisites
 - for compiling Qt [pyrcc5](http://manpages.ubuntu.com/manpages/trusty/man1/pyrcc5.1.html)
