@@ -204,7 +204,7 @@ class EDC_OGC:
         self.toolbar.setObjectName(u'Euro Data Cube')
         self.pluginIsActive = False
         self.dockwidget = None
-        self.instances = {}
+        self.instances = {'pre-configured layers': ''}
         self.base_url = None
         self.service_url = None
         self.data_source = None
@@ -294,7 +294,7 @@ class EDC_OGC:
     def _check_local_variables(self):
         """ Checks if local variables are of type string or unicode. If they are not it sets them to ''
         """
-        valid_types = str if is_qgis_version_3() else (str, unicode)
+        valid_types = str
 
         if not isinstance(self.base_url, valid_types):
             self.base_url = ''
@@ -913,7 +913,7 @@ class EDC_OGC:
             self.clear_dim_boxes()
             self.dockwidget.dim_check.setChecked(False)
             self.dockwidget.wave_check.setChecked(False)
-            self.dockwidget.layers_check.setChecked(False)
+            self.dockwidget.layers_check.setChecked(True)
 
             # uncheck layers, dimension and wavelengths
             self.check_layer_box()
@@ -1094,29 +1094,22 @@ class EDC_OGC:
         :rtype: str
         """
         plugin_params = [self.get_time_name()]
-        additional_parameter = ''
-        collection_name = ''
-        layer_name = '_' + self.dockwidget.layers.currentText()
-
+        collection_name = self.dockwidget.collections.currentText()
+        
         plugin_params.extend([Settings.parameters_wms['styles'], Settings.parameters['crs']])
-        # <collection title> - [<layer title>|<bands>|<wavelengths>] (<style title>, <crs>, <time range>)
-
 
         # in case of dimension or wavelengths are requested, we need only the collection name
         if self.dockwidget.dim_check.isChecked():
-           additional_parameter = ',{}'.format(self.dim_bands)
-           layer_name = ''
+           layer_name = self.dim_bands
 
 
-        elif self.dockwidget.dim_check.isChecked():
-            additional_parameter = ',{}'.format(self.dim_wavelengths)
-            layer_name = ''
-        else :
-            collection_name = self.dockwidget.collections.currentText() + '_'
+        elif self.dockwidget.wave_check.isChecked():
+            layer_name = self.dim_wavelengths
         
-
-        return '{}{} ({}{})'.format(collection_name, layer_name, ', '.join(plugin_params), additional_parameter)
-
+        elif self.dockwidget.layers_check.isChecked():
+           layer_name = self.dockwidget.layers.currentText()
+    
+        return '{}_[{}] ({})'.format(collection_name, layer_name, ', '.join(plugin_params))
 
 
     def update_download_format(self):
@@ -1317,7 +1310,7 @@ class EDC_OGC:
 
 
     def check_dim_box(self):
-        
+
         if not self.dockwidget.dim_check.isChecked():
             self.clear_dim_boxes()
         else:
