@@ -14,6 +14,8 @@ parameters = {
     'title': '',
     'layers': '',
     'time': '',
+    'maxcc': '100',
+    'priority': 'mostRecent',
     'crs': 'EPSG:3857'
 }
 
@@ -65,24 +67,6 @@ parameters_wmts = {
     'tileMatrixSet': 'PopularWebMercator512'
 }
 
-# data_source_props = {'S2L1C': {'url': services_base_url,
-#                                'wfs_name': 'S2.TILE',
-#                                'pretty_name': 'Sentinel-2 L1C'},
-#                      'S2L2A': {'url': services_base_url,
-#                                'wfs_name': 'DSS2',
-#                                'pretty_name': 'Sentinel-2 L2A'},
-#                      'S1GRD': {'url': services_base_url,
-#                                'wfs_name': 'DSS3',
-#                                'pretty_name': 'Sentinel-1'},
-#                      'L8L1C': {'url': uswest_base_url,
-#                                'wfs_name': 'DSS6',
-#                                'pretty_name': 'Landsat 8'},
-#                      'MODIS': {'url': uswest_base_url,
-#                                'wfs_name': 'DSS5',
-#                                'pretty_name': 'MODIS'},
-#                      'DEM': {'url': uswest_base_url,
-#                              'wfs_name': 'DSS4',
-#                              'pretty_name': 'DEM'}}
 
 # values for UI selections
 priorities = [('mostRecent', 'Most recent'),

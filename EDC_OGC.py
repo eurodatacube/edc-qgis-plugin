@@ -287,6 +287,8 @@ class EDC_OGC:
         self.dockwidget.destination.setText(self.download_folder)
         self.set_values()
 
+        self.dockwidget.priority.clear()
+        self.dockwidget.priority.addItems([priority[1] for priority in Settings.priorities])
 
         self.dockwidget.format.clear()
         self.dockwidget.format.addItems([image_format[1] for image_format in Settings.image_formats])
@@ -435,7 +437,10 @@ class EDC_OGC:
 
         # Every parameter that QGIS layer doesn't use by default must be in url
         # And url has to be encoded
-        url = '{}?Time={}{}'.format(self.service_url, self.get_time(),additional_parameters)
+
+        
+        url = '{}?Time={}{}& &priority={}&maxcc={}'.format(self.service_url, self.get_time(),additional_parameters,
+                                                           Settings.parameters['priority'], Settings.parameters['maxcc'])
         return '{}url={}'.format(uri, quote_plus(url))
 
     
@@ -859,6 +864,8 @@ class EDC_OGC:
             self.update_selected_style()
             
         Settings.parameters['time'] = self.get_time()
+        Settings.parameters['priority'] = Settings.priorities[self.dockwidget.priority.currentIndex()][0]
+        Settings.parameters['maxcc'] = str(self.dockwidget.maxcc.value())
 
     def update_selected_crs(self):
         """ Updates crs with selected EDC-OGC CRS
@@ -952,6 +959,12 @@ class EDC_OGC:
                 Settings.parameters['title'] = wms_layers[layers_index].name
 
 
+    def update_maxcc_label(self):
+        """
+        Update Max Cloud Coverage Label when slider value change
+        :return:
+        """
+        self.dockwidget.maxccLabel.setText('Cloud coverage {}%'.format(self.dockwidget.maxcc.value()))
 
     def get_time(self):
         """
@@ -1059,6 +1072,8 @@ class EDC_OGC:
         :return:
         """
         info_list = [self.dockwidget.collections.currentText(), Settings.parameters['layers']]
+        info_list.append(Settings.parameters['maxcc'])
+        info_list.append(Settings.parameters['priority'])
         info_list.extend(bbox.split(','))
 
         name = '.'.join(map(str, ['_'.join(map(str, info_list)),
@@ -1095,8 +1110,9 @@ class EDC_OGC:
         """
         plugin_params = [self.get_time_name()]
         collection_name = self.dockwidget.collections.currentText()
-        
-        plugin_params.extend([Settings.parameters_wms['styles'], Settings.parameters['crs']])
+
+        plugin_params.extend([Settings.parameters_wms['styles'], Settings.parameters['crs'],
+                              Settings.parameters['priority'], '{}%'.format(Settings.parameters['maxcc'])])
 
         # in case of dimension or wavelengths are requested, we need only the collection name
         if self.dockwidget.dim_check.isChecked():
@@ -1374,7 +1390,8 @@ class EDC_OGC:
                 self.dockwidget.wavelength_2.currentIndexChanged.connect(self.set_wavelengths)
                 self.dockwidget.wavelength_3.currentIndexChanged.connect(self.set_wavelengths)
                 self.dockwidget.calendar.currentPageChanged.connect(self.update_month)
-                
+                self.dockwidget.maxcc.valueChanged.connect(self.update_maxcc_label)
+                self.dockwidget.maxcc.sliderReleased.connect(self.update_parameters)
 
 
                 self.dockwidget.destination.editingFinished.connect(self.change_download_folder)
