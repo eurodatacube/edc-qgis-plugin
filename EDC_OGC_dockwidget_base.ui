@@ -220,14 +220,7 @@
               </rect>
              </property>
              <layout class="QGridLayout" name="gridLayout_4">
-              <item row="6" column="0">
-               <widget class="QLabel" name="label">
-                <property name="text">
-                 <string>Layer</string>
-                </property>
-               </widget>
-              </item>
-              <item row="28" column="1">
+              <item row="29" column="1">
                <spacer name="verticalSpacer">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
@@ -240,7 +233,7 @@
                 </property>
                </spacer>
               </item>
-              <item row="18" column="1">
+              <item row="19" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout">
                 <item>
                  <widget class="QLineEdit" name="time0">
@@ -345,7 +338,7 @@
                 </property>
                </widget>
               </item>
-              <item row="28" column="1">
+              <item row="29" column="1">
                <spacer name="verticalSpacer">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
@@ -390,7 +383,7 @@
                 </property>
                </widget>
               </item>
-              <item row="13" column="1">
+              <item row="14" column="1">
                <widget class="QComboBox" name="epsg">
                 <property name="minimumSize">
                  <size>
@@ -429,14 +422,14 @@
                 </property>
                </widget>
               </item>
-              <item row="11" column="0">
+              <item row="12" column="0">
                <widget class="QLabel" name="label_5">
                 <property name="text">
                  <string>Style</string>
                 </property>
                </widget>
               </item>
-              <item row="13" column="0">
+              <item row="14" column="0">
                <widget class="QLabel" name="crsLabel">
                 <property name="text">
                  <string>CRS</string>
@@ -450,14 +443,14 @@
                 </property>
                </widget>
               </item>
-              <item row="18" column="0">
+              <item row="19" column="0">
                <widget class="QLabel" name="timeRangeLabel">
                 <property name="text">
                  <string>Time range</string>
                 </property>
                </widget>
               </item>
-              <item row="11" column="1">
+              <item row="12" column="1">
                <widget class="QComboBox" name="styles">
                 <property name="maximumSize">
                  <size>
@@ -467,7 +460,7 @@
                 </property>
                </widget>
               </item>
-              <item row="19" column="1">
+              <item row="20" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_6">
                 <item>
                  <widget class="QLabel" name="calendarSpacer">
@@ -1006,26 +999,7 @@
                 </item>
                </layout>
               </item>
-              <item row="6" column="1">
-               <widget class="QComboBox" name="layers">
-                <property name="minimumSize">
-                 <size>
-                  <width>400</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>400</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="editable">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="10" column="1">
+              <item row="11" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_14">
                 <item>
                  <widget class="QRadioButton" name="wave_check">
@@ -1058,7 +1032,7 @@
                 </item>
                </layout>
               </item>
-              <item row="19" column="0">
+              <item row="20" column="0">
                <layout class="QVBoxLayout" name="verticalCalendarLayout">
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -1089,7 +1063,7 @@
                 </item>
                </layout>
               </item>
-              <item row="20" column="1">
+              <item row="21" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
                  <widget class="QLabel" name="maxccLabel">
@@ -1156,21 +1130,28 @@
                 </item>
                </layout>
               </item>
-              <item row="10" column="0">
+              <item row="11" column="0">
                <widget class="QLabel" name="label_4">
                 <property name="text">
                  <string>Wavelengths</string>
                 </property>
                </widget>
               </item>
-              <item row="8" column="0">
+              <item row="9" column="0">
                <widget class="QLabel" name="label_3">
                 <property name="text">
                  <string>Bands</string>
                 </property>
                </widget>
               </item>
-              <item row="8" column="1">
+              <item row="22" column="0">
+               <widget class="QLabel" name="priorityLabel">
+                <property name="text">
+                 <string>Image priority</string>
+                </property>
+               </widget>
+              </item>
+              <item row="9" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_13">
                 <property name="sizeConstraint">
                  <enum>QLayout::SetMaximumSize</enum>
@@ -1227,14 +1208,7 @@
                 </item>
                </layout>
               </item>
-              <item row="21" column="0">
-               <widget class="QLabel" name="priorityLabel">
-                <property name="text">
-                 <string>Image priority</string>
-                </property>
-               </widget>
-              </item>
-              <item row="21" column="1">
+              <item row="22" column="1">
                <widget class="QComboBox" name="priority">
                 <property name="minimumSize">
                  <size>
@@ -1247,6 +1221,47 @@
                   <width>400</width>
                   <height>16777215</height>
                  </size>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QRadioButton" name="layers_check">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="layers">
+                  <property name="minimumSize">
+                   <size>
+                    <width>380</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label">
+                <property name="text">
+                 <string>Layer</string>
                 </property>
                </widget>
               </item>

@@ -122,7 +122,7 @@ class Capabilities:
             wavelengths = layer.find('{}Dimension[@name="dim_wavelengths"]'.format(namespace))
 
             self.wavelengths[layer_name] = wavelengths.text.split(',') if wavelengths is not None else []
-            self.dimensions[layer_name] = dimensions.text.split(',')
+            self.dimensions[layer_name] = dimensions.text.split(',') if dimensions is not None else []
 
             self.collection_list[layer_name] =  layer.find('{}Name'.format(namespace)).text
             self.map_layers(layer, namespace, self.collections)
@@ -345,7 +345,7 @@ class EDC_OGC:
     # --------------------------------------------------------------------------
 
     def update_instance_props(self, instance_changed=False):
-        """ Update lists of service type, layers and CRS available with current ogc-edc url
+        """ Update lists of layers and CRS available with current ogc-edc url
 
         :param instance_changed: True if url has changed, False otherwise
         :type instance_changed: bool
@@ -361,11 +361,11 @@ class EDC_OGC:
             if not instance_changed:
                 self.dockwidget.collections.setCurrentIndex(collection_index)
 
-            layer_index = self.dockwidget.layers.currentIndex() 
-            self.dockwidget.layers.clear()
-            self.dockwidget.layers.addItems([layer.name for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
-            if not instance_changed:
-                self.dockwidget.layers.setCurrentIndex(layer_index)
+            # layer_index = self.dockwidget.layers.currentIndex() 
+            # self.dockwidget.layers.clear()
+            # self.dockwidget.layers.addItems([layer.name for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
+            # if not instance_changed:
+            #     self.dockwidget.layers.setCurrentIndex(layer_index)
 
             self.dockwidget.epsg.clear()
             
@@ -422,9 +422,6 @@ class EDC_OGC:
         uri = ''
         additional_parameters = ''
 
-        if self.dockwidget.wave_check.isChecked() or self.dockwidget.dim_check.isChecked() :
-            Settings.parameters['layers'] = self.capabilities.collection_list[self.dockwidget.collections.currentText()]
-        
         if self.dockwidget.wave_check.isChecked():
             additional_parameters = '&dim_wavelengths={}'.format(self.dim_wavelengths)
              
@@ -482,6 +479,7 @@ class EDC_OGC:
         return url
 
     def get_instances_list(self, base_url):
+
         if base_url != '' :
             url = base_url + '/instances'
         else:
@@ -913,14 +911,12 @@ class EDC_OGC:
 
             self.clear_wavelengths_boxes()
             self.clear_dim_boxes()
-
-            self.dockwidget.layers.addItems([layer.name for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
-            self.update_selected_layer()
-            self.fill_dim_boxes()
-            self.fill_wave_boxes()
             self.dockwidget.dim_check.setChecked(False)
             self.dockwidget.wave_check.setChecked(False)
-            # uncheck the dimension and wavelengths boxes
+            self.dockwidget.layers_check.setChecked(False)
+
+            # uncheck layers, dimension and wavelengths
+            self.check_layer_box()
             self.check_dim_box()
             self.check_wave_box()
 
@@ -1103,6 +1099,9 @@ class EDC_OGC:
         layer_name = '_' + self.dockwidget.layers.currentText()
 
         plugin_params.extend([Settings.parameters_wms['styles'], Settings.parameters['crs']])
+        # <collection title> - [<layer title>|<bands>|<wavelengths>] (<style title>, <crs>, <time range>)
+
+
         # in case of dimension or wavelengths are requested, we need only the collection name
         if self.dockwidget.dim_check.isChecked():
            additional_parameter = ',{}'.format(self.dim_bands)
@@ -1160,7 +1159,8 @@ class EDC_OGC:
             self.show_message("Please provide a valid URL", Message.INFO)
             self.dockwidget.baseUrl.setText(new_base_url)
             return
-
+        if new_base_url[-1] != '/' :
+            new_base_url +=  '/'
         self.get_instances_list(new_base_url)
 
         capabilities = self.change_instance_ID(new_base_url)
@@ -1291,23 +1291,41 @@ class EDC_OGC:
                     return
         return new_values
 
+    def check_layer_box(self):
 
+        if not self.dockwidget.layers_check.isChecked():
+            self.dockwidget.layers.clear()
+            self.dockwidget.styles.clear()
+        else:
+            self.dockwidget.dim_check.setChecked(False)
+            self.dockwidget.wave_check.setChecked(False)
+            self.dockwidget.layers.addItems([layer.name for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
+            self.update_selected_layer()
+            self.check_dim_box()
+            self.check_wave_box()
 
     def check_wave_box(self):
+
         if not self.dockwidget.wave_check.isChecked():
             self.clear_wavelengths_boxes()
         else:
             self.dockwidget.dim_check.setChecked(False)
+            self.dockwidget.layers_check.setChecked(False)
             self.fill_wave_boxes()
+            self.check_dim_box()
+            Settings.parameters['layers'] = self.capabilities.collection_list[self.dockwidget.collections.currentText()]
 
 
     def check_dim_box(self):
-
+        
         if not self.dockwidget.dim_check.isChecked():
             self.clear_dim_boxes()
         else:
             self.dockwidget.wave_check.setChecked(False)
+            self.dockwidget.layers_check.setChecked(False)
             self.fill_dim_boxes()
+            self.check_wave_box()
+            Settings.parameters['layers'] = self.capabilities.collection_list[self.dockwidget.collections.currentText()]
             
 
     def run(self):
@@ -1353,11 +1371,12 @@ class EDC_OGC:
                 self.dockwidget.time1.editingFinished.connect(self.update_dates)
                 self.dockwidget.calendar.clicked.connect(self.add_time)
                 self.dockwidget.exactDate.clicked.connect(self.change_exact_date)
-                self.dockwidget.dim_check.clicked.connect(self.check_dim_box)
+                self.dockwidget.dim_check.toggled.connect(self.check_dim_box)
                 self.dockwidget.dimension_1.currentIndexChanged.connect(self.set_dimensions)
                 self.dockwidget.dimension_2.currentIndexChanged.connect(self.set_dimensions)
                 self.dockwidget.dimension_3.currentIndexChanged.connect(self.set_dimensions)
-                self.dockwidget.wave_check.clicked.connect(self.check_wave_box)
+                self.dockwidget.wave_check.toggled.connect(self.check_wave_box)
+                self.dockwidget.layers_check.toggled.connect(self.check_layer_box)
                 self.dockwidget.wavelength_1.currentIndexChanged.connect(self.set_wavelengths)
                 self.dockwidget.wavelength_2.currentIndexChanged.connect(self.set_wavelengths)
                 self.dockwidget.wavelength_3.currentIndexChanged.connect(self.set_wavelengths)
