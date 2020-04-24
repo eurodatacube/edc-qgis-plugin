@@ -13,5 +13,5 @@ to setup locally:
 
 ## Prerequisites
 - for compiling Qt [pyrcc5](http://manpages.ubuntu.com/manpages/trusty/man1/pyrcc5.1.html)
-- [lxml](https://lxml.de/installation.html)
+
 

@@ -31,8 +31,8 @@ import datetime
 import math
 import re
 import ast
+import json
 from xml.etree import ElementTree
-import lxml.html as html 
 try:
     from urllib.parse import quote_plus
 except ImportError:
@@ -504,7 +504,7 @@ class EDC_OGC:
     def get_instances_list(self, base_url):
 
         if base_url != '' :
-            url = base_url + '/instances'
+            url = base_url + '/instances.json'
         else:
             return    
 
@@ -514,13 +514,9 @@ class EDC_OGC:
         if not response:
             return None
 
-        # this is a temporary method, the instances shall be provided in a json response    
-        html_root = html.fromstring(response.content)
-        div = html_root.xpath('//ul')
-
-        for layer in div[0].findall('li'):
-            instance = layer.find('a')
-            self.instances[instance.text] = instance.attrib['href']
+        instances = json.loads(response.text)
+        for instance in instances:
+            self.instances[instance['name']] = instance['id']
 
         self.dockwidget.instanceId.clear()
         self.dockwidget.instanceId.addItems([name for name in self.instances.keys()])
