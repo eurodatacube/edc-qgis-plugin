@@ -13,8 +13,8 @@ email=office@eox.at
 about=The Euro Data Cube plugin provides an interface to render all the layers created in the Euro Data Cube Configuration Utility for a generated EDC-OGC url. Users can select and explore layers, parameters, and styles of each collection that is configured in the EDC configuration panel, by simply providing the generated EDC-OGC URL.
 
 homepage=https://eurodatacube.com
-tracker=
-repository=
+tracker=https://github.com/eurodatacube/edc-qgis-plugin/issues
+repository=https://github.com/eurodatacube/edc-qgis-plugin
 
 # End of mandatory metadata
 

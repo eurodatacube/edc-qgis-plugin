@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
-
+#-------------------------------------------------------------------------------
+#
+# Project: Euro Data Cube <http://eurodatacube.com>
+# 
+#
+#-------------------------------------------------------------------------------
+# Copyright (C) 2020 EOX IT Services GmbH <office@eox.at>
+#
+# This program is free software; you can redistribute it and/or modify  
+# it under the terms of the GNU General Public License as published by  
+# the Free Software Foundation; either version 2 of the License, or     
+# (at your option) any later version.  
+# 
+# This code was developed based on SentinelHub plugin by Sinergise ltd.
+#     Original SentinelHub plugin : <https://github.com/sinergise/qgis_sentinel_hub/tree/master/SentinelHub>.
+#     copyright            : (C) 2017 by Sentinel Hub, Sinergise ltd.
+#     email                : info@sentinel-hub.com 
+#-------------------------------------------------------------------------------
 
 import os.path
 from sys import version_info

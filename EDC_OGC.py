@@ -1,4 +1,22 @@
 # -*- coding: utf-8 -*-
+#-------------------------------------------------------------------------------
+#
+# Project: Euro Data Cube <http://eurodatacube.com>
+# 
+#
+#-------------------------------------------------------------------------------
+# Copyright (C) 2020 EOX IT Services GmbH <office@eox.at>
+#
+# This program is free software; you can redistribute it and/or modify  
+# it under the terms of the GNU General Public License as published by  
+# the Free Software Foundation; either version 2 of the License, or     
+# (at your option) any later version.  
+# 
+# This code was developed based on SentinelHub plugin by Sinergise ltd.
+#     Original SentinelHub plugin : <https://github.com/sinergise/qgis_sentinel_hub/tree/master/SentinelHub>.
+#     copyright            : (C) 2017 by Sentinel Hub, Sinergise ltd.
+#     email                : info@sentinel-hub.com 
+#-------------------------------------------------------------------------------
 
 # This looks like the best way to make plugin compatible for QGIS versions 2.* and 3.0
 from sys import version_info
@@ -1140,10 +1158,12 @@ class EDC_OGC:
         Change if using exact date or not
         :return:
         """
+
         if self.dockwidget.exactDate.isChecked():
             self.dockwidget.time1.hide()
             self.dockwidget.timeLabel.hide()
             self.move_calendar('time0')
+            self.add_time()
         else:
             if self.time0 and self.time1 and self.time0 > self.time1:
                 self.time1 = ''
