@@ -124,7 +124,7 @@ class Capabilities:
 
 
 
-        
+
     def load_xml(self, xml_root):
         """ Loads info from getCapabilities.xml
         """
@@ -222,7 +222,7 @@ class EDC_OGC:
         self.toolbar.setObjectName(u'Euro Data Cube')
         self.pluginIsActive = False
         self.dockwidget = None
-        self.instances = {'pre-configured layers': ''}
+        self.instances = {'Default (pre-configured layers)': ''}
         self.base_url = None
         self.service_url = None
         self.data_source = None
@@ -370,25 +370,25 @@ class EDC_OGC:
         :param instance_changed: True if url has changed, False otherwise
         :type instance_changed: bool
         """
-        
+
         self.dockwidget.createLayerLabel.setText('Create new WMS layer')
 
         if self.capabilities:
             collection_index = self.dockwidget.collections.currentIndex()
             self.dockwidget.collections.clear()
-            
+
             self.dockwidget.collections.addItems([collection.name for collection in self.capabilities.collections])
             if not instance_changed:
                 self.dockwidget.collections.setCurrentIndex(collection_index)
 
-            # layer_index = self.dockwidget.layers.currentIndex() 
+            # layer_index = self.dockwidget.layers.currentIndex()
             # self.dockwidget.layers.clear()
             # self.dockwidget.layers.addItems([layer.name for layer in self.capabilities.layers[self.dockwidget.collections.currentText()]])
             # if not instance_changed:
             #     self.dockwidget.layers.setCurrentIndex(layer_index)
 
             self.dockwidget.epsg.clear()
-            
+
             self.dockwidget.epsg.addItems([crs.name for crs in self.capabilities.crs_list])
 
     def update_current_wms_layers(self, selected_layer=None):
@@ -444,24 +444,24 @@ class EDC_OGC:
 
         if self.dockwidget.wave_check.isChecked():
             additional_parameters = '&dim_wavelengths={}'.format(self.dim_wavelengths)
-             
+
         elif self.dockwidget.dim_check.isChecked():
                 additional_parameters = '&dim_bands={}'.format(self.dim_bands)
 
         request_parameters = list(Settings.parameters_wms.items()) + list(Settings.parameters.items())
         for parameter, value in request_parameters:
-            
+
             uri += '{}={}&'.format(parameter, value)
 
         # Every parameter that QGIS layer doesn't use by default must be in url
         # And url has to be encoded
 
-        
+
         url = '{}?Time={}{}& &priority={}&maxcc={}'.format(self.service_url, self.get_time(),additional_parameters,
                                                            Settings.parameters['priority'], Settings.parameters['maxcc'])
         return '{}url={}'.format(uri, quote_plus(url))
 
-    
+
 
     def get_wcs_url(self, bbox, crs=None):
         """ Generate URL for WCS request from parameters
@@ -506,7 +506,7 @@ class EDC_OGC:
         if base_url != '' :
             url = base_url + '/instances.json'
         else:
-            return    
+            return
 
         response = self.download_from_url(url, raise_invalid_id=True)
 
@@ -521,7 +521,7 @@ class EDC_OGC:
         self.dockwidget.instanceId.clear()
         self.dockwidget.instanceId.addItems([name for name in self.instances.keys()])
 
-        
+
         self.dockwidget.instanceId.setCurrentIndex(0)
 
     def change_instance_ID(self, url):
@@ -531,7 +531,7 @@ class EDC_OGC:
                 self.show_message("Please provide a valid URL", Message.INFO)
                 return
             url = self.base_url
-        
+
         if self.dockwidget.instanceId.currentIndex() >= 0:
             instance_extension = self.instances[self.dockwidget.instanceId.currentText()]
             self.service_url = url + instance_extension
@@ -578,7 +578,7 @@ class EDC_OGC:
 
         return capabilities
 
-   
+
 
     def download_wcs_data(self, url, filename):
         """
@@ -735,16 +735,16 @@ class EDC_OGC:
 
         def errorCatcher(msg, tag, level):
             if tag == 'WMS' and level != 0:
-    
+
                 result = re.search('BAD REQUEST url: (.*)]', msg)
                 if result :
                     error_url = result.group(1)
                     response = requests.get(error_url)
-                    
+
                     dict_error = re.search(r'({.+})', response.text)
 
                     if dict_error :
-                        
+
                         error_content = dict_error.group(0)
 
                         message =  ast.literal_eval(error_content)
@@ -754,7 +754,7 @@ class EDC_OGC:
             QgsApplication.messageLog().messageReceived.connect(errorCatcher)
         else :
             QgsMessageLog.instance().messageReceived.connect(errorCatcher)
-        
+
         if new_layer.isValid():
             if on_top and self.get_qgis_layers():
                 self.iface.setActiveLayer(self.get_qgis_layers()[0])
@@ -876,7 +876,7 @@ class EDC_OGC:
         if self.capabilities:
             self.update_selected_crs()
             self.update_selected_style()
-            
+
         Settings.parameters['time'] = self.get_time()
         Settings.parameters['priority'] = Settings.priorities[self.dockwidget.priority.currentIndex()][0]
         Settings.parameters['maxcc'] = str(self.dockwidget.maxcc.value())
@@ -899,21 +899,21 @@ class EDC_OGC:
         self.dockwidget.wavelength_1.clear()
         self.dockwidget.wavelength_2.clear()
         self.dockwidget.wavelength_3.clear()
-        
+
         self.dim_wavelengths =''
 
     def clear_dim_boxes(self):
         self.dockwidget.dimension_1.clear()
         self.dockwidget.dimension_2.clear()
         self.dockwidget.dimension_3.clear()
-        
+
         self.dim_bands =''
 
     def fill_dim_boxes(self):
         self.dockwidget.dimension_1.addItems(self.capabilities.dimensions[self.dockwidget.collections.currentText()])
         self.dockwidget.dimension_2.addItems(self.capabilities.dimensions[self.dockwidget.collections.currentText()])
         self.dockwidget.dimension_3.addItems(self.capabilities.dimensions[self.dockwidget.collections.currentText()])
-        
+
         self.set_dimensions()
 
     def fill_wave_boxes(self):
@@ -924,10 +924,10 @@ class EDC_OGC:
 
     def update_selected_collection(self):
         # for box in (self.dockwidget.horizontalLayout_13.itemAt(i) for i in range(self.dockwidget.horizontalLayout_13.count())):
-            
+
         #     print(dir(box.widget()))
         if self.dockwidget.collections.currentText() != "":
-            
+
             self.dockwidget.layers.clear()
 
             self.clear_wavelengths_boxes()
@@ -955,7 +955,7 @@ class EDC_OGC:
             Settings.parameters_wms['styles'] = self.dockwidget.styles.currentText()
 
 
-    
+
 
     def update_selected_layer(self):
         """ Updates properties of selected OGC layer
@@ -964,7 +964,7 @@ class EDC_OGC:
         if self.dockwidget.collections.currentText() != "":
 
             wms_layers = self.capabilities.layers[self.dockwidget.collections.currentText()]
-            
+
             if 0 <= layers_index < len(wms_layers):
                 self.update_styles(wms_layers, layers_index)
                 self.update_parameters()
@@ -1135,11 +1135,11 @@ class EDC_OGC:
 
         elif self.dockwidget.wave_check.isChecked():
             layer_name = self.dim_wavelengths
-        
+
         elif self.dockwidget.layers_check.isChecked():
            layer_name = self.dockwidget.layers.currentText()
-    
-        return '{}_[{}] ({})'.format(collection_name, layer_name, ', '.join(plugin_params))
+
+        return '{} - {} ({})'.format(collection_name, layer_name, ', '.join(plugin_params))
 
 
     def update_download_format(self):
@@ -1168,7 +1168,7 @@ class EDC_OGC:
 
             self.dockwidget.time1.show()
             self.dockwidget.timeLabel.show()
-            
+
 
     def change_base_url(self):
         """
@@ -1198,10 +1198,10 @@ class EDC_OGC:
                 self.show_message("New URL and layers set.", Message.SUCCESS)
             QSettings().setValue(Settings.service_url_location, new_base_url)
             self.update_selected_collection()
-    
+
         else:
             self.dockwidget.baseUrl.setText(self.base_url)
-        
+
     def change_download_folder(self):
         """ Sets new download folder"""
         new_download_folder = self.dockwidget.destination.text()
@@ -1351,7 +1351,6 @@ class EDC_OGC:
             self.fill_dim_boxes()
             self.check_wave_box()
             Settings.parameters['layers'] = self.capabilities.collection_list[self.dockwidget.collections.currentText()]
-            
 
     def run(self):
         """Run method that loads and starts the plugin and binds all UI actions"""

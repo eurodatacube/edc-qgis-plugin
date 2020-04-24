@@ -379,7 +379,7 @@
               <item row="4" column="0">
                <widget class="QLabel" name="instanceIdLabel_2">
                 <property name="text">
-                 <string>instance ID</string>
+                 <string>Instance ID</string>
                 </property>
                </widget>
               </item>
