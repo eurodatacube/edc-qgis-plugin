@@ -4,8 +4,8 @@ This script contains parameters and settings for Euro Data Cube services
 """
 
 # Locations where QGIS will save values
-service_url_location = "Euro Data Cube/service_base_url"
-download_folder_location = "Euro Data Cube/download_folder"
+service_url_location = "EuroDataCube/service_base_url"
+download_folder_location = "EuroDataCube/download_folder"
 
 service_types = ['WMS', 'WMTS']
 
