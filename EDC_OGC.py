@@ -50,14 +50,14 @@ if is_qgis_version_3():
 
     from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt, QDate
     from PyQt5.QtGui import QIcon, QTextCharFormat
-    from PyQt5.QtWidgets import QAction, QFileDialog
+    from PyQt5.QtWidgets import QAction, QFileDialog, QCheckBox
 else:
     from qgis.utils import QGis as Qgis
     from qgis.core import QgsMapLayerRegistry as QgsProject
     from qgis.gui import QgsMessageBar
 
     from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, Qt, QDate
-    from PyQt4.QtGui import QIcon, QAction, QTextCharFormat, QFileDialog
+    from PyQt4.QtGui import QIcon, QAction, QTextCharFormat, QFileDialog, QCheckBox
 
 
 POP_WEB = 'EPSG:3857'
@@ -226,6 +226,7 @@ class EDC_OGC:
         self.base_url = None
         self.service_url = None
         self.data_source = None
+        
 
         # Set value
         self.base_url = QSettings().value(Settings.service_url_location, '')
@@ -246,6 +247,12 @@ class EDC_OGC:
 
         self.download_current_window = True
         self.custom_bbox_params = {}
+        self.wcs_bands = {}
+        self.wcs_crs = {}
+        self.size = {
+            'resx': '', 
+            'resy': ''
+            }
         for name in ['latMin', 'latMax', 'lngMin', 'lngMax']:
             self.custom_bbox_params[name] = ''
 
@@ -326,8 +333,8 @@ class EDC_OGC:
     def set_values(self):
         """ Updates some values for the wcs download request
         """
-        self.dockwidget.inputResX.setText(Settings.parameters_wcs['resx'])
-        self.dockwidget.inputResY.setText(Settings.parameters_wcs['resy'])
+        self.dockwidget.inputResX.setText(self.size['resx'])
+        self.dockwidget.inputResY.setText(self.size['resy'])
         self.dockwidget.latMin.setText(self.custom_bbox_params['latMin'])
         self.dockwidget.latMax.setText(self.custom_bbox_params['latMax'])
         self.dockwidget.lngMin.setText(self.custom_bbox_params['lngMin'])
@@ -462,8 +469,100 @@ class EDC_OGC:
         return '{}url={}'.format(uri, quote_plus(url))
 
 
+    def get_coverage_info(self):
+        """ Get DescribeCoverage and 'WCS' getCapabilities for mapping available bands and crs's in the WCS GetCoverage Request"""
+        
+        # getting bands
+        collection_name = self.capabilities.collection_list[self.dockwidget.collections.currentText()].split('__')[0]
+        gmlcov_pre = '{http://www.opengis.net/gmlcov/1.0}'
+        wcs_pre = '{http://www.opengis.net/wcs/2.0}'
+        swe_pre = '{http://www.opengis.net/swe/2.0}'
+        self.wcs_bands = {}
+        
+        url = '{}?service=WCS&version=2.0.1&request=DescribeCoverage&coverageid={}__2020-05-08'.format(self.base_url, collection_name )
+        response = self.download_from_url(url, raise_invalid_id=True)
+        xml_root = ElementTree.fromstring(response.content)
+        data_record =  xml_root.find('./{}CoverageDescription/{}rangeType/{}DataRecord'.format(wcs_pre, gmlcov_pre, swe_pre))
+        
+        for band in data_record.findall('./{}field'.format(swe_pre)):
+            name  = band.get('name')
+            discribtion = band.find('./{0}Quantity/{0}description'.format(swe_pre)).text
+            self.wcs_bands[discribtion] = name
 
-    def get_wcs_url(self, bbox, crs=None):
+        self.add_checkbox(list(self.wcs_bands.keys()))
+
+    
+        # getting projections
+        response = self.download_from_url(self.get_capabilities_url(self.base_url, 'WCS', '2.0.1'), raise_invalid_id=True)
+
+
+        if not response:
+            return None
+        crs_pre = '{http://www.opengis.net/wcs/crs/1.0}'
+        xml_root = ElementTree.fromstring(response.content)
+        CrsMetadata =  xml_root.find('./{0}ServiceMetadata/{0}Extension/{1}CrsMetadata'.format(wcs_pre, crs_pre))
+        for proj in CrsMetadata.findall('./{}crsSupported'.format(crs_pre)):
+            proj_string = proj.text.split('/')
+
+            crs_name = '{}:{}'.format(proj_string[-3].upper(), proj_string[-1])
+
+            self.wcs_crs[crs_name] = self.capitalize_EPSG(proj_string)
+
+            self.add_crs(list(self.wcs_crs.keys()))
+
+    def capitalize_EPSG(self, string_list):
+        # link in getCApabilities does is not correct, unless the 'epsg' part is capitalized 'EPSG'
+
+        string_list[-3] = string_list[-3].upper()
+
+        return '/'.join(map(str, string_list)) 
+
+    def add_checkbox(self, list):
+        # clear previous checkboxes
+        for i in reversed(range(self.dockwidget.bandsWCS.count())):
+            widget = self.dockwidget.bandsWCS.takeAt(i).widget()
+            if widget is not None :
+                widget.setParent(None)
+        rows = len(list)
+        count = 0 
+        if rows >= 3:
+            for i in range(rows//3):
+                for j in range(3):
+                    self.dockwidget.bandsWCS.addWidget(QCheckBox(list[count]), i, j)
+                    count+=1
+        else :
+            for i in range(rows):
+                self.dockwidget.bandsWCS.addWidget(QCheckBox(list[i]))
+        # by default all the boxes are checked        
+        for i in reversed(range(self.dockwidget.bandsWCS.count())): 
+            self.dockwidget.bandsWCS.itemAt(i).widget().setChecked(True)
+
+    def add_crs(self, list):
+        self.dockwidget.CrsWCS.clear()
+
+        self.dockwidget.CrsWCS.addItems(proj for proj in list)
+        self.update_download_crs()
+
+    def create_wcs_bands(self):
+        bands = []
+        for i in range(self.dockwidget.bandsWCS.count()):
+            checkbox = self.dockwidget.bandsWCS.itemAt(i).widget()
+            discribtion = checkbox.text()
+            if checkbox.isChecked():
+                bands.append(self.wcs_bands[discribtion])
+
+        return bands
+
+    def update_download_crs(self):
+        """ Updates properties of selected OGC layer
+        """
+        index = self.dockwidget.CrsWCS.currentIndex()
+        
+        if index >= 0:
+
+            Settings.parameters_wcs['subsettingCRS'] = self.wcs_crs[self.dockwidget.CrsWCS.currentText()]
+
+    def get_wcs_url(self, bbox, scale):
         """ Generate URL for WCS request from parameters
 
         :param bbox: Bounding box in form of "xmin,ymin,xmax,ymax"
@@ -472,31 +571,22 @@ class EDC_OGC:
         :type crs: str or None
         """
         url = '{}?'.format(self.service_url)
-        request_parameters = list(Settings.parameters_wcs.items()) + list(Settings.parameters.items())
 
+        bands_list = self.create_wcs_bands()
+        bands = ','.join(map(str, bands_list))
+        request_parameters = list(Settings.parameters_wcs.items())
         for parameter, value in request_parameters:
-            if parameter in ('resx', 'resy'):
-                value = value.strip('m') + 'm'
-            if parameter == 'crs':
-                value = crs if crs else Settings.parameters['crs']
+            if parameter == 'subset':
+                value = self.get_time()
             url += '{}={}&'.format(parameter, value)
-        return '{}bbox={}'.format(url, bbox)
+        return '{}scalesize={}&rangesubset={}&subset={}&subset={}'.format(url, scale, bands, bbox[0], bbox[1])
 
-    def get_wfs_url(self, time_range):
-        """ Generate URL for WFS request from parameters """
-
-        url = '{}?'.format(self.service_url)
-        for parameter, value in Settings.parameters_wfs.items():
-            url += '{}={}&'.format(parameter, value)
-
-        return '{}bbox={}&time={}&srsname={}'.format(url, self.bbox_to_string(self.get_bbox()), time_range,
-                                                               Settings.parameters['crs'])
-
+   
     @staticmethod
-    def get_capabilities_url(base_url, service, get_json=False):
+    def get_capabilities_url(base_url, service, version, get_json=False):
         """ Generates url for obtaining service capabilities
         """
-        url = '{}?service={}&request=GetCapabilities&version=1.3.0'.format(base_url, service)
+        url = '{}?service={}&request=GetCapabilities&version={}'.format(base_url, service, version)
         if get_json:
             return url + '&format=application/json'
         return url
@@ -557,7 +647,7 @@ class EDC_OGC:
         :rtype: Capabilities or None
         """
 
-        response = self.download_from_url(self.get_capabilities_url(base_url, service), raise_invalid_id=True)
+        response = self.download_from_url(self.get_capabilities_url(base_url, service, '1.3.0'), raise_invalid_id=True)
 
 
         if not response:
@@ -569,7 +659,7 @@ class EDC_OGC:
         capabilities.load_xml(xml_root)
 
 
-        json_response = self.download_from_url(self.get_capabilities_url(base_url, service, get_json=True), raise_invalid_id=True)
+        json_response = self.download_from_url(self.get_capabilities_url(base_url, service, '1.3.0', get_json=True), raise_invalid_id=True)
         if json_response:
             try:
                 capabilities.load_json(json_response.json())
@@ -622,6 +712,7 @@ class EDC_OGC:
         :return: download response or None if download failed
         :rtype: requests.response or None
         """
+
         try:
             proxy_dict, auth = self.get_proxy_config()
             response = requests.get(url, stream=stream,
@@ -768,26 +859,29 @@ class EDC_OGC:
         """
         Get window bbox
         """
+    
+        download_crs = self.get_wcs_crs()
         bbox = self.iface.mapCanvas().extent()
-        target_crs = QgsCoordinateReferenceSystem(crs if crs else Settings.parameters['crs'])
+        target_crs = QgsCoordinateReferenceSystem(crs if crs else download_crs)
         if is_qgis_version_3():
             current_crs = QgsCoordinateReferenceSystem(self.iface.mapCanvas().mapSettings().destinationCrs().authid())
         else:
             current_crs = QgsCoordinateReferenceSystem(self.iface.mapCanvas().mapRenderer().destinationCrs().authid())
         if current_crs != target_crs:
-            if is_qgis_version_3():
-                xform = QgsCoordinateTransform(current_crs, target_crs, QgsProject.instance())
-            else:
-                xform = QgsCoordinateTransform(current_crs, target_crs)
-            bbox = xform.transform(bbox)  # if target CRS is UTM and bbox is out of UTM bounds this fails, not sure how to fix
-
+           
+           bbox = self.transform_bbox(bbox, current_crs, target_crs)
+        
         return bbox
 
-    @staticmethod
-    def bbox_to_string(bbox, crs=None):
+
+    def bbox_to_string(self, bbox, crs=None, service='WMS'):
         """ Transforms BBox object into string
         """
-        target_crs = QgsCoordinateReferenceSystem(crs if crs else Settings.parameters['crs'])
+        download_crs = self.get_wcs_crs()
+        if service == 'WMS':
+            target_crs = QgsCoordinateReferenceSystem(crs if crs else Settings.parameters['crs'])
+        else : 
+            target_crs = QgsCoordinateReferenceSystem(crs if crs else download_crs)
 
         if target_crs.authid() == WGS84:
             precision = 6
@@ -796,17 +890,44 @@ class EDC_OGC:
             precision = 2
             bbox_list = [bbox.xMinimum(), bbox.yMinimum(), bbox.xMaximum(), bbox.yMaximum()]
 
-        return ','.join(map(lambda coord: str(round(coord, precision)), bbox_list))
+        if service == 'WMS':
+            return ','.join(map(lambda coord: str(round(coord, precision)), bbox_list))
+        else :
+            return ['long({},{})'.format(bbox.xMinimum(), bbox.xMaximum()) , 'lat({},{})'.format(bbox.yMinimum(), bbox.yMaximum())]
 
     def get_custom_bbox(self):
         """ Creates BBox from values set by user
         """
+        download_crs = self.get_wcs_crs()
         lat_min = min(float(self.custom_bbox_params['latMin']), float(self.custom_bbox_params['latMax']))
         lat_max = max(float(self.custom_bbox_params['latMin']), float(self.custom_bbox_params['latMax']))
         lng_min = min(float(self.custom_bbox_params['lngMin']), float(self.custom_bbox_params['lngMax']))
         lng_max = max(float(self.custom_bbox_params['lngMin']), float(self.custom_bbox_params['lngMax']))
-        return QgsRectangle(lng_min, lat_min, lng_max, lat_max)
+        bbox = QgsRectangle(lng_min, lat_min, lng_max, lat_max)
+        target_crs = QgsCoordinateReferenceSystem(download_crs)
 
+        if target_crs.authid() != WGS84:
+            wgs_84 = QgsCoordinateReferenceSystem('EPSG:4326')
+            bbox = self.transform_bbox(bbox, wgs_84, target_crs)
+
+        return bbox
+
+    def get_wcs_crs(self):
+
+        download_crs_list = [key for key,value in self.wcs_crs.items() if value == Settings.parameters_wcs['subsettingCRS']]
+        
+        return next(iter(download_crs_list), None)
+
+    def transform_bbox(self, bbox, current, target):
+
+        if is_qgis_version_3():
+            xform = QgsCoordinateTransform(current, target, QgsProject.instance())
+        else:
+            xform = QgsCoordinateTransform(current, target)
+
+        bbox = xform.transformBoundingBox(bbox, 0, True) 
+
+        return bbox
     def take_window_bbox(self):
         """
         From Custom extent get values, save them and show them in UI
@@ -824,7 +945,8 @@ class EDC_OGC:
     def get_bbox_size(self, bbox, crs=None):
         """ Returns approximate width and height of bounding box in meters
         """
-        bbox_crs = QgsCoordinateReferenceSystem(crs if crs else Settings.parameters['crs'])
+        download_crs = self.get_wcs_crs()
+        bbox_crs = QgsCoordinateReferenceSystem(crs if crs else download_crs)
         utm_crs = QgsCoordinateReferenceSystem(self.lng_to_utm_zone(
             (bbox.xMinimum() + bbox.xMaximum()) / 2,
             (bbox.yMinimum() + bbox.yMaximum()) / 2))
@@ -941,6 +1063,9 @@ class EDC_OGC:
             self.check_dim_box()
             self.check_wave_box()
 
+            # fill the download tab
+            self.get_coverage_info()
+
     def update_styles(self, layers, index):
         self.dockwidget.styles.clear()
         self.dockwidget.styles.addItems([style for style in layers[index].styles])
@@ -964,12 +1089,13 @@ class EDC_OGC:
         if self.dockwidget.collections.currentText() != "":
 
             wms_layers = self.capabilities.layers[self.dockwidget.collections.currentText()]
+            collection_name = self.capabilities.collection_list[self.dockwidget.collections.currentText()].split('__')[0]
 
             if 0 <= layers_index < len(wms_layers):
                 self.update_styles(wms_layers, layers_index)
                 self.update_parameters()
                 Settings.parameters['layers'] = wms_layers[layers_index].id
-                Settings.parameters_wcs['coverage'] = wms_layers[layers_index].id
+                Settings.parameters_wcs['coverageid'] = '{}__2020-05-08'.format(collection_name)
                 Settings.parameters['title'] = wms_layers[layers_index].name
 
 
@@ -1052,12 +1178,15 @@ class EDC_OGC:
         if not self.service_url:
             return self.missing_url()
 
-        if Settings.parameters_wcs['resx'] == '' or Settings.parameters_wcs['resy'] == '':
+        if self.size['resx'] == '' or self.size['resy'] == '':
             return self.show_message('Spatial resolution parameters are not set.', Message.CRITICAL)
         if not self.download_current_window:
             for value in self.custom_bbox_params.values():
                 if value == '':
                     return self.show_message('Custom bounding box parameters are missing.', Message.CRITICAL)
+        bands_list = self.create_wcs_bands()
+        if Settings.parameters_wcs['format'] in ('image/png', 'image/jpeg') and len(bands_list) > 3 :
+            return self.show_message('Selected image format (png or jpeg) can have only 3 bands.', Message.CRITICAL)
 
         self.update_parameters()
 
@@ -1066,15 +1195,18 @@ class EDC_OGC:
             if not self.download_folder:
                 return self.show_message("Download canceled. No destination set.", Message.CRITICAL)
 
-        try:
+        try :
             bbox = self.get_bbox() if self.download_current_window else self.get_custom_bbox()
         except Exception:
             return self.show_message("Unable to transform to selected CRS, please zoom in or change CRS",
                                      Message.CRITICAL)
 
-        bbox_str = self.bbox_to_string(bbox, None if self.download_current_window else WGS84)
-        url = self.get_wcs_url(bbox_str, None if self.download_current_window else WGS84)
-        filename = self.get_filename(bbox_str)
+        bbox_list = self.bbox_to_string(bbox, None, 'WCS')
+
+
+        scale_size = 'x({}),y({})'.format(self.size['resx'], self.size['resy'])
+        url = self.get_wcs_url(bbox_list, scale_size)
+        filename = self.get_filename('{},{}'.format(bbox_list[0], bbox_list[1]))
 
         self.download_wcs_data(url, filename)
 
@@ -1294,7 +1426,7 @@ class EDC_OGC:
 
         for name, value in new_values.items():
             if name in ['resx', 'resy']:
-                Settings.parameters_wcs[name] = value
+                self.size[name] = value
             else:
                 self.custom_bbox_params[name] = value
 
@@ -1415,7 +1547,7 @@ class EDC_OGC:
                 self.dockwidget.format.currentIndexChanged.connect(self.update_download_format)
                 self.dockwidget.inputResX.editingFinished.connect(self.update_values)
                 self.dockwidget.inputResY.editingFinished.connect(self.update_values)
-
+                self.dockwidget.CrsWCS.currentIndexChanged.connect(self.update_download_crs)
                 self.dockwidget.radioCurrentExtent.clicked.connect(lambda: self.toggle_extent('current'))
                 self.dockwidget.radioCustomExtent.clicked.connect(lambda: self.toggle_extent('custom'))
                 self.dockwidget.latMin.editingFinished.connect(self.update_values)
@@ -1427,6 +1559,7 @@ class EDC_OGC:
                 self.dockwidget.buttonDownload.clicked.connect(self.download_caption)
                 self.dockwidget.refreshExtent.clicked.connect(self.take_window_bbox)
                 self.dockwidget.selectDestination.clicked.connect(self.select_destination)
+                self.dockwidget.tabWidget.currentChanged.connect(self.get_coverage_info)
 
 
 

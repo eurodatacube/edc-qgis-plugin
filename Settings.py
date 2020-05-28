@@ -44,14 +44,12 @@ parameters_wfs = {
 
 # WCS parameters
 parameters_wcs = {
-    'service': 'wcs',
+    'service': 'WCS',
     'request': 'GetCoverage',
+    'subsettingCRS': 'http://www.opengis.net/def/crs/epsg/0/4326',
     'format': 'image/png',
-    'showLogo': 'false',
     'transparent': 'false',
-    'version': '1.1.1',
-    'resx': '10',
-    'resy': '10'
+    'version': '2.0.1'
 }
 
 # WMTS parameters
@@ -78,6 +76,7 @@ cloud_correction = ['NONE', 'REPLACE']  # Not yet implemented
 
 image_formats = [('image/png', 'PNG'),
                  ('image/jpeg', 'JPEG'),
+                 ('image/tiff', 'TIFF'),
                  ('image/tiff;depth=8', '8-bit TIFF'),
                  ('image/tiff;depth=16', '16-bit TIFF'),
                  ('image/tiff;depth=32f', '32-bit float TIFF')]
