@@ -226,7 +226,6 @@ class EDC_OGC:
         self.base_url = None
         self.service_url = None
         self.data_source = None
-        
 
         # Set value
         self.base_url = QSettings().value(Settings.service_url_location, '')
@@ -511,7 +510,7 @@ class EDC_OGC:
             self.add_crs(list(self.wcs_crs.keys()))
 
     def capitalize_EPSG(self, string_list):
-        # link in getCApabilities does is not correct, unless the 'epsg' part is capitalized 'EPSG'
+        # link in getCApabilities is not correct, unless the 'epsg' part is capitalized 'EPSG'
 
         string_list[-3] = string_list[-3].upper()
 
@@ -581,7 +580,6 @@ class EDC_OGC:
             url += '{}={}&'.format(parameter, value)
         return '{}scalesize={}&rangesubset={}&subset={}&subset={}'.format(url, scale, bands, bbox[0], bbox[1])
 
-   
     @staticmethod
     def get_capabilities_url(base_url, service, version, get_json=False):
         """ Generates url for obtaining service capabilities
@@ -712,7 +710,6 @@ class EDC_OGC:
         :return: download response or None if download failed
         :rtype: requests.response or None
         """
-
         try:
             proxy_dict, auth = self.get_proxy_config()
             response = requests.get(url, stream=stream,
@@ -1195,15 +1192,13 @@ class EDC_OGC:
             if not self.download_folder:
                 return self.show_message("Download canceled. No destination set.", Message.CRITICAL)
 
-        try :
+        try:
             bbox = self.get_bbox() if self.download_current_window else self.get_custom_bbox()
         except Exception:
             return self.show_message("Unable to transform to selected CRS, please zoom in or change CRS",
                                      Message.CRITICAL)
 
         bbox_list = self.bbox_to_string(bbox, None, 'WCS')
-
-
         scale_size = 'x({}),y({})'.format(self.size['resx'], self.size['resy'])
         url = self.get_wcs_url(bbox_list, scale_size)
         filename = self.get_filename('{},{}'.format(bbox_list[0], bbox_list[1]))
